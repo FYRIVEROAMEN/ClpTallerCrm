@@ -72,3 +72,103 @@
   padding: 2rem;
   width: 100%;
 }
+
+/* --- Mobile Responsiveness --- */
+@media (max-width: 768px) {
+  .app-container {
+    flex-direction: column;
+  }
+
+  /* Flex utilities overriders for mobile */
+  .mobile-col {
+    flex-direction: column !important;
+    align-items: stretch !important;
+  }
+  
+  .mobile-col > * {
+    width: 100% !important;
+  }
+  
+  .mobile-gap-sm {
+    gap: 0.5rem !important;
+  }
+  
+  /* Tables horizontally scrollable */
+  .table-container {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    width: 100%;
+  }
+
+  /* Grid 1-col adapter */
+  .grid-mobile-1 {
+    grid-template-columns: 1fr !important;
+  }
+  
+  /* Calendar specific overrides */
+  .calendar-grid-header {
+    overflow-x: auto;
+  }
+
+  /* Transform sidebar into a bottom navigation bar */
+  .sidebar {
+    position: fixed;
+    top: auto;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: auto;
+    padding: 0.75rem;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    border-right: none;
+    border-top: 1px solid var(--glass-border);
+    z-index: 100;
+  }
+
+  /* Hide the logo on mobile to save space */
+  .sidebar-logo {
+    display: none;
+  }
+
+  /* Hide the user profile and logout container (the second child of .sidebar) */
+  .sidebar > div:last-child {
+    display: none;
+  }
+
+  /* Ensure the div that wraps the nav links expands fully */
+  .sidebar > div:first-child {
+    width: 100%;
+  }
+
+  .nav-links {
+    flex-direction: row;
+    justify-content: space-around;
+    width: 100%;
+  }
+
+  .nav-link {
+    flex-direction: column;
+    gap: 0.25rem;
+    padding: 0.5rem;
+    font-size: 0.7rem;
+    text-align: center;
+  }
+
+  .nav-link:hover {
+    transform: none; /* remove desktop hover transform */
+    background: transparent;
+  }
+
+  .nav-link.active {
+    border-left: none;
+    border-bottom: 3px solid var(--color-primary);
+    background: transparent; /* optionally remove background on active for cleaner look */
+  }
+
+  .main-content {
+    padding: 1rem;
+    padding-bottom: 80px; /* Accounts for bottom navbar height */
+  }
+}

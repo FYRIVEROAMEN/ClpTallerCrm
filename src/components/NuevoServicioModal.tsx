@@ -1,20 +1,32 @@
 import React, { useState } from 'react';
 import { X, Wrench, DollarSign, Gauge } from 'lucide-react';
-import type { Vehicle } from '../types';
+import type { Vehicle, ServiceRecord } from '../types';
 import api from '../api';
 
 interface NuevoServicioModalProps {
   isOpen: boolean;
   onClose: () => void;
   vehicle: Vehicle;
+  existingService?: ServiceRecord | null;
   onSuccess: () => void;
 }
 
-export function NuevoServicioModal({ isOpen, onClose, vehicle, onSuccess }: NuevoServicioModalProps) {
+export function NuevoServicioModal({ isOpen, onClose, vehicle, existingService, onSuccess }: NuevoServicioModalProps) {
+  const isEditing = !!existingService;
+  // Initialize state based on existingService or defaults
   const [description, setDescription] = useState('');
   const [cost, setCost] = useState(0);
-  const [mileage, setMileage] = useState(vehicle?.currentMileage || 0);
+  const [mileage, setMileage] = useState(0);
   const [loading, setLoading] = useState(false);
+
+  // Sync state when existingService or modal open state changes
+  React.useEffect(() => {
+    if (isOpen) {
+      setDescription(existingService?.description || '');
+      setCost(existingService?.cost || 0);
+      setMileage(existingService?.mileage || vehicle?.currentMileage || 0);
+    }
+  }, [isOpen, existingService, vehicle]);
 
   if (!isOpen || !vehicle) return null;
 
@@ -23,12 +35,22 @@ export function NuevoServicioModal({ isOpen, onClose, vehicle, onSuccess }: Nuev
     setLoading(true);
 
     try {
-      await api.post(`/vehiculos/${vehicle.id}/servicio`, {
-        serviceId: `s${Date.now()}`,
-        description,
-        mileage,
-        cost
-      });
+      if (isEditing && existingService) {
+        // Edit mode
+        await api.put(`/servicios/${existingService.id}`, {
+          description,
+          mileage,
+          cost
+        });
+      } else {
+        // Create mode
+        await api.post(`/vehiculos/${vehicle.id}/servicio`, {
+          serviceId: `s${Date.now()}`,
+          description,
+          mileage,
+          cost
+        });
+      }
       onSuccess();
       onClose();
     } catch (err) {
@@ -50,9 +72,11 @@ export function NuevoServicioModal({ isOpen, onClose, vehicle, onSuccess }: Nuev
           <X size={20} />
         </button>
         
-        <h2>Nuevo Servicio</h2>
+        <h2>{isEditing ? 'Editar Servicio' : 'Nuevo Servicio'}</h2>
         <p style={{ marginBottom: '1.5rem', color: 'var(--color-text-muted)' }}>
-          Registra un nuevo mantenimiento para el vehículo {vehicle.plate}.
+          {isEditing 
+            ? `Actualiza los detalles del mantenimiento para el vehículo ${vehicle.plate}.` 
+            : `Registra un nuevo mantenimiento para el vehículo ${vehicle.plate}.`}
         </p>
 
         <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
@@ -86,11 +110,11 @@ export function NuevoServicioModal({ isOpen, onClose, vehicle, onSuccess }: Nuev
             </div>
 
             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-              <label style={{ fontSize: '0.85rem', color: 'var(--color-text-muted)' }}>Nuevo Kilometraje</label>
+              <label style={{ fontSize: '0.85rem', color: 'var(--color-text-muted)' }}>Kilometraje del Servicio</label>
               <div style={{ position: 'relative' }}>
                 <Gauge size={16} style={{ position: 'absolute', left: '0.75rem', top: '50%', transform: 'translateY(-50%)', color: 'var(--color-text-muted)' }} />
                 <input 
-                  required type="number" min={vehicle.currentMileage}
+                  required type="number" min={isEditing ? 0 : vehicle.currentMileage}
                   value={mileage} onChange={e => setMileage(Number(e.target.value))}
                   className="form-input"
                   style={{ width: '100%', padding: '0.6rem 0.6rem 0.6rem 2.25rem', borderRadius: 'var(--radius-md)', border: '1px solid var(--color-border)', background: 'var(--color-bg)', color: 'white' }}

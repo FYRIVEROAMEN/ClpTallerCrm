@@ -1,10 +1,14 @@
 import { useState, useEffect } from 'react';
-import { CarFront, Clock, UserCheck, Wrench, ShieldAlert } from 'lucide-react';
+import { useParams, useNavigate } from 'react-router-dom';
+import { CarFront, Clock, UserCheck, Wrench, ShieldAlert, ArrowLeft, Printer, Edit2 } from 'lucide-react';
+import jsPDF from 'jspdf';
 import type { Vehicle, Client, ServiceRecord } from '../types';
 import { NuevoServicioModal } from './NuevoServicioModal';
 import api from '../api';
 
 export function PerfilVehiculo() {
+  const { id } = useParams<{ id: string }>();
+  const navigate = useNavigate();
   const [vehicle, setVehicle] = useState<Vehicle | null>(null);
   const [owner, setOwner] = useState<Client | null>(null);
   const [services, setServices] = useState<ServiceRecord[]>([]);
@@ -13,24 +17,22 @@ export function PerfilVehiculo() {
   
   const [isTransferModalOpen, setIsTransferModalOpen] = useState(false);
   const [isServiceModalOpen, setIsServiceModalOpen] = useState(false);
+  const [selectedServiceToEdit, setSelectedServiceToEdit] = useState<ServiceRecord | null>(null);
   const [selectedNewOwner, setSelectedNewOwner] = useState('');
 
-  // En un proyecto real leeríamos el :id desde useParams. Para esta simplificación usaremos uso del primer vehículo si no se pasó por estado u otra prop, pero asumimos que sí está en el backend.
   useEffect(() => {
     fetchData();
-  }, []);
+  }, [id]);
 
   const fetchData = async () => {
     try {
       setLoading(true);
-      // Fetchear los vehiculos y obtener el 1ero por simplificacion (como en el original)
-      // O idealmente un ID si lo pasa la ruta. Aquí mantenemos el comportamiento anterior:
-      const vehiclesRes = await api.get('/vehiculos');
-      if (vehiclesRes.data.length > 0) {
-        const currentVehicle = vehiclesRes.data[0];
+      const vehicleRes = await api.get(`/vehiculos/${id}`);
+      const currentVehicle = vehicleRes.data;
+      
+      if (currentVehicle) {
         setVehicle(currentVehicle);
         
-        // Obtener restantes
         const [serviciosRes, clientesRes] = await Promise.all([
           api.get(`/vehiculos/${currentVehicle.id}/servicios`),
           api.get('/clientes')
@@ -60,12 +62,74 @@ export function PerfilVehiculo() {
     }
   };
 
+  const generarPDFServicio = (service: ServiceRecord) => {
+    if (!vehicle || !owner) return;
+    
+    const doc = new jsPDF();
+    
+    // Header
+    doc.setFontSize(22);
+    doc.setTextColor(59, 130, 246);
+    doc.text("CLP Taller", 20, 30);
+    
+    doc.setFontSize(10);
+    doc.setTextColor(100, 100, 100);
+    doc.text("Comprobante de Servicio", 20, 38);
+    
+    // Info del Cliente y Fecha
+    doc.setFontSize(12);
+    doc.setTextColor(40, 40, 40);
+    const serviceDate = new Date(service.date).toLocaleDateString();
+    doc.text(`Fecha del Servicio: ${serviceDate}`, 20, 55);
+    
+    doc.text("Datos del Cliente:", 20, 70);
+    doc.setFontSize(10);
+    doc.text(`Nombre: ${owner.name}`, 20, 78);
+    doc.text(`Teléfono: ${owner.phone}`, 20, 84);
+
+    // Info del Vehiculo
+    doc.setFontSize(12);
+    doc.text("Datos del Vehículo:", 120, 70);
+    doc.setFontSize(10);
+    doc.text(`Dominio: ${vehicle.plate.toUpperCase()}`, 120, 78);
+    doc.text(`Marca/Modelo: ${vehicle.brand} ${vehicle.model}`, 120, 84);
+    doc.text(`Kilometraje actual: ${service.mileage} km`, 120, 90);
+
+    doc.setDrawColor(200, 200, 200);
+    doc.line(20, 100, 190, 100);
+
+    // Detalle
+    doc.setFontSize(12);
+    doc.text("Detalle del Trabajo Realizado:", 20, 115);
+    doc.setFontSize(10);
+    
+    const splitDesc = doc.splitTextToSize(service.description, 170);
+    doc.text(splitDesc, 20, 125);
+
+    // Cost
+    doc.setDrawColor(200, 200, 200);
+    doc.line(20, 160, 190, 160);
+    doc.setFontSize(14);
+    doc.setTextColor(0, 0, 0);
+    doc.text(`Total Abonado: $${service.cost}`, 20, 175);
+
+    doc.save(`Servicio-${vehicle.plate}-${serviceDate.replace(/\//g, '-')}.pdf`);
+  };
+
   if (loading) return <div className="glass-panel" style={{ minHeight: '80vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>Cargando perfil...</div>;
   if (!vehicle) return <div className="glass-panel" style={{ minHeight: '80vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>No hay vehículos registrados aún.</div>;
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
       
+      <button 
+        onClick={() => navigate(-1)} 
+        className="btn btn-secondary" 
+        style={{ alignSelf: 'flex-start', display: 'flex', alignItems: 'center', gap: '0.5rem', background: 'transparent', border: 'none', padding: '0' }}
+      >
+        <ArrowLeft size={16} /> Volver
+      </button>
+
       {/* Header Perfil */}
       <div className="glass-panel" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
         <div style={{ display: 'flex', gap: '1.5rem', alignItems: 'center' }}>
@@ -97,7 +161,7 @@ export function PerfilVehiculo() {
           <button className="btn btn-secondary" onClick={() => setIsTransferModalOpen(true)}>
             Transferir Propiedad
           </button>
-          <button className="btn btn-primary" onClick={() => setIsServiceModalOpen(true)}>
+          <button className="btn btn-primary" onClick={() => { setSelectedServiceToEdit(null); setIsServiceModalOpen(true); }}>
             + Nuevo Servicio
           </button>
         </div>
@@ -115,7 +179,7 @@ export function PerfilVehiculo() {
         {services.length > 0 ? (
           <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
             {services.map((service: ServiceRecord) => (
-              <div key={service.id} style={{ padding: '1.25rem', background: 'var(--color-surface)', borderRadius: 'var(--radius-md)', border: '1px solid var(--color-border)', display: 'flex', gap: '1.5rem' }}>
+              <div key={service.id} style={{ padding: '1.25rem', background: 'var(--color-surface)', borderRadius: 'var(--radius-md)', border: '1px solid var(--color-border)', display: 'flex', gap: '1.5rem', alignItems: 'center' }}>
                 <div style={{ width: '48px', height: '48px', borderRadius: 'var(--radius-sm)', background: 'rgba(59, 130, 246, 0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
                   <Wrench size={24} className="text-primary" />
                 </div>
@@ -128,6 +192,14 @@ export function PerfilVehiculo() {
                     <span>Fecha: {new Date(service.date).toLocaleDateString()}</span>
                     <span>Kilometraje: {service.mileage.toLocaleString()} km</span>
                   </div>
+                </div>
+                <div style={{ display: 'flex', gap: '0.5rem', flexShrink: 0 }}>
+                  <button className="btn btn-secondary" style={{ padding: '0.5rem' }} title="Editar Servicio" onClick={() => { setSelectedServiceToEdit(service); setIsServiceModalOpen(true); }}>
+                    <Edit2 size={16} />
+                  </button>
+                  <button className="btn btn-secondary" style={{ padding: '0.5rem' }} title="Imprimir Comprobante" onClick={() => generarPDFServicio(service)}>
+                    <Printer size={16} />
+                  </button>
                 </div>
               </div>
             ))}
@@ -171,11 +243,12 @@ export function PerfilVehiculo() {
         </div>
       )}
 
-      {/* Modal Nuevo Servicio */}
+      {/* Modal Nuevo/Editar Servicio */}
       <NuevoServicioModal
         isOpen={isServiceModalOpen}
-        onClose={() => setIsServiceModalOpen(false)}
+        onClose={() => { setIsServiceModalOpen(false); setSelectedServiceToEdit(null); }}
         vehicle={vehicle}
+        existingService={selectedServiceToEdit}
         onSuccess={fetchData} 
       />
     </div>

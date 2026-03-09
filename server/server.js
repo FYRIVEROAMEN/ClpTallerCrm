@@ -51,6 +51,23 @@ app.get('/api/clientes', auth, (req, res) => {
   });
 });
 
+app.get('/api/clientes/:id', auth, (req, res) => {
+  const { id } = req.params;
+  console.log('Buscando cliente id:', id);
+  db.get(`SELECT * FROM clients WHERE id = ?`, [id], (err, row) => {
+    if (err) {
+      console.error('Error DB:', err);
+      return res.status(500).json({ error: err.message });
+    }
+    if (!row) {
+       console.log('Cliente no encontrado');
+       return res.status(404).json({ error: 'Cliente no encontrado' });
+    }
+    console.log('Cliente devuelto:', row.name);
+    res.json(row);
+  });
+});
+
 app.post('/api/clientes', auth, (req, res) => {
   const { id, name, phone, email } = req.body;
   db.run(`INSERT INTO clients (id, name, phone, email) VALUES (?, ?, ?, ?)`, 
@@ -137,6 +154,18 @@ app.get('/api/vehiculos/:id/servicios', auth, (req, res) => {
     if (err) return res.status(500).json({ error: err.message });
     res.json(rows);
   });
+});
+
+app.put('/api/servicios/:id', auth, (req, res) => {
+  const { id } = req.params;
+  const { description, mileage, cost } = req.body;
+  db.run(`UPDATE services SET description = ?, mileage = ?, cost = ? WHERE id = ?`, 
+    [description, mileage, cost, id], 
+    function(err) {
+      if (err) return res.status(500).json({ error: err.message });
+      res.json({ success: true, id, description });
+    }
+  );
 });
 
 // --- TURNOS ---

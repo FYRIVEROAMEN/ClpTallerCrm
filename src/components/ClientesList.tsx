@@ -83,12 +83,12 @@ export function ClientesList() {
 
   return (
     <div className="glass-panel" style={{ minHeight: '80vh' }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem' }}>
+      <div className="mobile-col" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem', gap: '1rem' }}>
         <div>
           <h2>Directorio de Clientes</h2>
           <p>Gestiona los clientes y sus vehículos asociados.</p>
         </div>
-        <button className="btn btn-primary" onClick={() => handleOpenClienteModal()}>
+        <button className="btn btn-primary" style={{ flexShrink: 0 }} onClick={() => handleOpenClienteModal()}>
           <Plus size={18} />
           Nuevo Cliente
         </button>
@@ -137,14 +137,14 @@ export function ClientesList() {
                     {getVehiclesCount(client.id)}
                   </div>
                 </td>
-                <td style={{ padding: '1rem', textAlign: 'right' }}>
+                <td style={{ padding: '1rem', textAlign: 'right', whiteSpace: 'nowrap' }}>
                   <button className="btn btn-secondary" style={{ padding: '0.4rem 0.6rem', fontSize: '0.8rem', marginRight: '0.5rem', background: 'transparent' }} onClick={() => handleOpenClienteModal(client)} title="Editar Cliente">
                     <Edit size={16} />
                   </button>
                   <button className="btn btn-primary" style={{ padding: '0.4rem 0.8rem', fontSize: '0.8rem', marginRight: '0.5rem' }} onClick={() => handleOpenAutoModal(client)}>
                     + Auto
                   </button>
-                  <Link to="/vehiculo" className="btn btn-secondary" style={{ padding: '0.4rem 0.8rem', fontSize: '0.8rem', textDecoration: 'none' }}>
+                  <Link to={`/cliente/${client.id}`} className="btn btn-secondary" style={{ padding: '0.4rem 0.8rem', fontSize: '0.8rem', textDecoration: 'none' }}>
                     Ver Perfil
                   </Link>
                 </td>

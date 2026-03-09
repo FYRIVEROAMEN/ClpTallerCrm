@@ -1,15 +1,17 @@
 import { useState, useEffect } from 'react';
 import { Calendar as CalendarIcon, ChevronLeft, ChevronRight, Bell, AlertCircle, Search } from 'lucide-react';
-import type { Appointment, Client } from '../types';
+import type { Appointment, Client, Vehicle } from '../types';
 import { TurnoModal } from './TurnoModal';
 import api from '../api';
 
 export function CalendarioTurnos() {
   const [appointments, setAppointments] = useState<Appointment[]>([]);
   const [clients, setClients] = useState<Client[]>([]);
+  const [vehicles, setVehicles] = useState<Vehicle[]>([]);
   const [currentWeekOffset, setCurrentWeekOffset] = useState(0);
   const [isTurnoModalOpen, setIsTurnoModalOpen] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [patenteSearch, setPatenteSearch] = useState('');
 
   useEffect(() => {
     fetchAppointments();
@@ -18,12 +20,14 @@ export function CalendarioTurnos() {
   const fetchAppointments = async () => {
     try {
       setLoading(true);
-      const [turnosRes, clientesRes] = await Promise.all([
+      const [turnosRes, clientesRes, vehiculosRes] = await Promise.all([
         api.get('/turnos'),
-        api.get('/clientes')
+        api.get('/clientes'),
+        api.get('/vehiculos')
       ]);
       setAppointments(turnosRes.data);
       setClients(clientesRes.data);
+      setVehicles(vehiculosRes.data);
     } catch (err) {
       console.error(err);
     } finally {
@@ -63,28 +67,28 @@ export function CalendarioTurnos() {
   }
 
   return (
-    <div style={{ display: 'grid', gridTemplateColumns: '1fr 300px', gap: '2rem' }}>
+    <div className="grid-mobile-1" style={{ display: 'grid', gridTemplateColumns: '1fr 300px', gap: '2rem' }}>
       
       {/* Columna Principal - Calendario */}
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem', minWidth: 0 }}>
+        <div className="mobile-col" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '1rem' }}>
           <div>
             <h1 style={{ marginBottom: '0.25rem' }}>Agenda y Turnos</h1>
             <p>Planifica las reparaciones y asigna horarios a los clientes.</p>
           </div>
-          <button className="btn btn-primary" style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }} onClick={() => setIsTurnoModalOpen(true)}>
+          <button className="btn btn-primary" style={{ display: 'flex', gap: '0.5rem', alignItems: 'center', flexShrink: 0 }} onClick={() => setIsTurnoModalOpen(true)}>
             <CalendarIcon size={18} />
             Agendar Turno
           </button>
         </div>
 
-        <div className="glass-panel" style={{ padding: '0' }}>
+        <div className="glass-panel" style={{ padding: '0', overflowX: 'auto' }}>
           {/* Calendar Header Nav */}
-          <div style={{ padding: '1.5rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid var(--glass-border)' }}>
+          <div className="mobile-col mobile-gap-sm" style={{ padding: '1.5rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid var(--glass-border)' }}>
             <h3 style={{ margin: 0 }}>
               {days[0].toLocaleDateString('es-ES', { month: 'long', year: 'numeric' })}
             </h3>
-            <div style={{ display: 'flex', gap: '0.25rem', alignItems: 'center' }}>
+            <div style={{ display: 'flex', gap: '0.25rem', alignItems: 'center', flexWrap: 'wrap', justifyContent: 'center' }}>
               <input 
                 type="date"
                 title="Ir a fecha específica"
@@ -143,27 +147,39 @@ export function CalendarioTurnos() {
             </div>
           </div>
 
-          {/* Calendar Grid Header */}
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', backgroundColor: 'var(--color-surface)', borderBottom: '1px solid var(--glass-border)' }}>
-            {days.map((day, idx) => (
-              <div key={idx} style={{ padding: '1rem', textAlign: 'center', borderRight: idx !== 6 ? '1px solid var(--glass-border)' : 'none' }}>
-                <div style={{ fontSize: '0.8rem', color: 'var(--color-text-muted)', fontWeight: 600 }}>{getDayName(day)}</div>
-                <div style={{ fontSize: '1.5rem', fontWeight: 600, marginTop: '0.25rem', color: (day.getDate() === new Date().getDate() && day.getMonth() === new Date().getMonth()) ? 'var(--color-primary)' : 'inherit' }}>
-                  {day.getDate()}
+          <div style={{ minWidth: '800px' }}>
+            {/* Calendar Grid Header */}
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', backgroundColor: 'var(--color-surface)', borderBottom: '1px solid var(--glass-border)' }}>
+              {days.map((day, idx) => (
+                <div key={idx} style={{ padding: '1rem', textAlign: 'center', borderRight: idx !== 6 ? '1px solid var(--glass-border)' : 'none' }}>
+                  <div style={{ fontSize: '0.8rem', color: 'var(--color-text-muted)', fontWeight: 600 }}>{getDayName(day)}</div>
+                  <div style={{ fontSize: '1.5rem', fontWeight: 600, marginTop: '0.25rem', color: (day.getDate() === new Date().getDate() && day.getMonth() === new Date().getMonth()) ? 'var(--color-primary)' : 'inherit' }}>
+                    {day.getDate()}
+                  </div>
                 </div>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
 
-          {/* Calendar Body Demo */}
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', minHeight: '400px' }}>
+            {/* Calendar Body Demo */}
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', minHeight: '400px' }}>
             {days.map((day, idx) => {
               // Filtrar turnos del dia actual iterado ignorando la hora
               const turnosDelDia = appointments.filter(a => {
                 const appointmentDate = new Date(a.date);
-                return appointmentDate.getDate() === day.getDate() && 
-                       appointmentDate.getMonth() === day.getMonth() && 
-                       appointmentDate.getFullYear() === day.getFullYear();
+                const isSameDay = appointmentDate.getDate() === day.getDate() && 
+                                  appointmentDate.getMonth() === day.getMonth() && 
+                                  appointmentDate.getFullYear() === day.getFullYear();
+                
+                if (!isSameDay) return false;
+                
+                if (patenteSearch.trim() !== '') {
+                  const vehicle = vehicles.find(v => v.id === a.vehicleId);
+                  if (!vehicle || !vehicle.plate.toLowerCase().includes(patenteSearch.toLowerCase())) {
+                    return false;
+                  }
+                }
+                
+                return true;
               });
 
               return (
@@ -198,6 +214,7 @@ export function CalendarioTurnos() {
                 </div>
               );
             })}
+            </div>
           </div>
         </div>
       </div>
@@ -236,6 +253,8 @@ export function CalendarioTurnos() {
             <input 
               type="text" 
               placeholder="Buscar por patente..." 
+              value={patenteSearch}
+              onChange={(e) => setPatenteSearch(e.target.value)}
               style={{ width: '100%', padding: '0.6rem 0.6rem 0.6rem 2.2rem', borderRadius: 'var(--radius-md)', border: '1px solid var(--color-border)', background: 'var(--color-surface)', color: 'white' }}
             />
           </div>

@@ -2,6 +2,7 @@ import React from 'react';
 import { BrowserRouter, Routes, Route, NavLink, Navigate } from 'react-router-dom';
 import { Wrench, Users, Calendar, LayoutDashboard, LogOut } from 'lucide-react';
 import { ClientesList } from './components/ClientesList';
+import { PerfilCliente } from './components/PerfilCliente';
 import { PerfilVehiculo } from './components/PerfilVehiculo';
 import { DashboardBahias } from './components/DashboardBahias';
 import { CalendarioTurnos } from './components/CalendarioTurnos';
@@ -78,7 +79,8 @@ function App() {
           <Route path="/login" element={<Login />} />
           <Route path="/" element={<ProtectedRoute><DashboardBahias /></ProtectedRoute>} />
           <Route path="/clientes" element={<ProtectedRoute><ClientesList /></ProtectedRoute>} />
-          <Route path="/vehiculo" element={<ProtectedRoute><PerfilVehiculo /></ProtectedRoute>} />
+          <Route path="/cliente/:id" element={<ProtectedRoute><PerfilCliente /></ProtectedRoute>} />
+          <Route path="/vehiculo/:id" element={<ProtectedRoute><PerfilVehiculo /></ProtectedRoute>} />
           <Route path="/turnos" element={<ProtectedRoute><CalendarioTurnos /></ProtectedRoute>} />
         </Routes>
       </BrowserRouter>

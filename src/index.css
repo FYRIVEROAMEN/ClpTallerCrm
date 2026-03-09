@@ -108,3 +108,20 @@ p {
   background-color: var(--color-surface);
   border-color: var(--color-text-muted);
 }
+
+/* Modals / Forms constraints */
+.form-input {
+  max-width: 100%;
+}
+
+@media (max-width: 768px) {
+  .glass-panel {
+    padding: 1rem;
+  }
+
+  /* Global utility: if padding is too big in modals */
+  .modal-content {
+    width: 90% !important; /* overriden if inline is 100% */
+    padding: 1rem;
+  }
+}

@@ -1,9 +1,11 @@
 import { useState, useEffect } from 'react';
-import { Settings, CheckCircle2, AlertTriangle, CarFront, Plus, Edit2, X } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import { Settings, CheckCircle2, AlertTriangle, CarFront, Plus, Edit2, X, ExternalLink } from 'lucide-react';
 import type { WorkBay, Vehicle } from '../types';
 import api from '../api';
 
 export function DashboardBahias() {
+  const navigate = useNavigate();
   const [bays, setBays] = useState<WorkBay[]>([]);
   const [vehicles, setVehicles] = useState<Vehicle[]>([]);
   const [isAssignModalOpen, setIsAssignModalOpen] = useState(false);
@@ -78,13 +80,13 @@ export function DashboardBahias() {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
       
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+      <div className="mobile-col" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '1rem' }}>
         <div>
           <h1 style={{ marginBottom: '0.5rem' }}>Estado del Taller</h1>
           <p>Monitorea y asigna vehículos a las diferentes bahías de trabajo.</p>
         </div>
-        <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
-          <div style={{ display: 'flex', gap: '1rem', background: 'var(--color-surface)', padding: '0.75rem', borderRadius: 'var(--radius-lg)', border: '1px solid var(--color-border)' }}>
+        <div className="mobile-col" style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
+          <div style={{ display: 'flex', gap: '1rem', background: 'var(--color-surface)', padding: '0.75rem', borderRadius: 'var(--radius-lg)', border: '1px solid var(--color-border)', justifyContent: 'center' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', paddingRight: '1rem', borderRight: '1px solid var(--color-border)' }}>
               <div style={{ width: '12px', height: '12px', borderRadius: '50%', backgroundColor: 'var(--color-success)' }} />
               <span style={{ fontSize: '0.9rem', color: 'var(--color-text-muted)' }}>Disponibles 
@@ -140,7 +142,30 @@ export function DashboardBahias() {
               </div>
 
               {bay.isOccupied && vehicle ? (
-                <div style={{ padding: '1rem', background: 'var(--color-surface)', borderRadius: 'var(--radius-md)', border: '1px solid var(--color-border)', marginBottom: '1.5rem' }}>
+                <div 
+                  onClick={() => navigate(`/cliente/${vehicle.ownerId}`)}
+                  style={{ 
+                    padding: '1rem', 
+                    background: 'var(--color-surface)', 
+                    borderRadius: 'var(--radius-md)', 
+                    border: '1px solid var(--color-border)', 
+                    marginBottom: '1.5rem',
+                    cursor: 'pointer',
+                    transition: 'all 0.2s ease',
+                    position: 'relative'
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.borderColor = 'var(--color-primary)';
+                    e.currentTarget.style.transform = 'translateY(-2px)';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.borderColor = 'var(--color-border)';
+                    e.currentTarget.style.transform = 'translateY(0)';
+                  }}
+                >
+                  <div style={{ position: 'absolute', top: '0.5rem', right: '0.5rem', color: 'var(--color-text-muted)' }}>
+                    <ExternalLink size={14} />
+                  </div>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '0.5rem' }}>
                     <div style={{ background: 'rgba(234, 179, 8, 0.1)', padding: '0.5rem', borderRadius: 'var(--radius-sm)' }}>
                       <CarFront size={24} style={{ color: 'var(--color-warning)' }} />
