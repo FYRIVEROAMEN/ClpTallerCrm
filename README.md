@@ -1,73 +1,41 @@
-# React + TypeScript + Vite
+# ClpTallerCrm
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Sistema integral de gestión diseñado para optimizar los flujos de trabajo en talleres mecánicos y de chapa y pintura. Este proyecto centraliza la administración de clientes, vehículos y órdenes de trabajo en una plataforma moderna y eficiente.
 
-Currently, two official plugins are available:
+## 🚀 Tecnologías y Herramientas
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+El desarrollo se basa en un stack tecnológico de alto rendimiento:
 
-## React Compiler
+* **Frontend**: React + Vite para una experiencia de usuario ágil y reactiva.
+* **Lenguaje**: TypeScript, garantizando robustez mediante tipado estático.
+* **Diseño**: Ant Design, proporcionando una interfaz profesional y estandarizada.
+* **Optimización**: Desarrollo asistido por **Inteligencia Artificial**, aplicando metodologías de **Prompt Engineering**.
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+## 🧠 Integración de IA
 
-## Expanding the ESLint configuration
+Este proyecto destaca por la implementación de soluciones mediante asistencia avanzada de IA:
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+* Migración y estructuración de lógica en **TypeScript** mediante flujos de trabajo optimizados.
+* Aplicación de conceptos de desarrollo con IA aprendidos en **BIG school** bajo la mentoría de **Brais Moure** y **Romuald Fons**.
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+## 🛠️ Instalación y Configuración
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+Para ejecutar el proyecto localmente, siga estos pasos:
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+1. **Clonación del repositorio**:
+   ```bash
+   git clone [https://github.com/FYRIVEROAMEN/ClpTallerCrm.git](https://github.com/FYRIVEROAMEN/ClpTallerCrm.git)
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+2. Instalacion de dependencias
+   npm install
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+3. Ejecución en entorno de desarrollo:
+   npm run dev
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+
+   Perfil del Desarrollador
+Desarrollado por Facundo Yamil Rivero Amen.
+
+Rol: Junior Full Stack Developer & Especialista en Soporte Técnico IT.
+
+Enfoque: Resolución analítica de incidentes y construcción de software escalable con enfoque en la experiencia del usuario.
