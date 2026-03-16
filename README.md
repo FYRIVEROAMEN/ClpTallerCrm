@@ -10,6 +10,8 @@ El desarrollo se basa en un stack tecnológico de alto rendimiento:
 * **Lenguaje**: TypeScript, garantizando robustez mediante tipado estático.
 * **Diseño**: Ant Design, proporcionando una interfaz profesional y estandarizada.
 * **Optimización**: Desarrollo asistido por **Inteligencia Artificial**, aplicando metodologías de **Prompt Engineering**.
+* **Vite**: Next Generation Frontend Tooling (HMR, builds rápidos).
+* **ESLint**: Configuración para mantener la calidad y consistencia del código.
 
 ## 🧠 Integración de IA
 
