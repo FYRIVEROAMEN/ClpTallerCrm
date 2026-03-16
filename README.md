@@ -1,20 +1,23 @@
-# ClpTallerCrm
+# ClpTallerCrm 🚗🛠️
 
-Sistema integral de gestión diseñado para optimizar los flujos de trabajo en talleres mecánicos y de chapa y pintura. Este proyecto centraliza la administración de clientes, vehículos y órdenes de trabajo en una plataforma moderna y eficiente.
+Sistema integral de gestión (CRM) diseñado para optimizar los flujos de trabajo en talleres mecánicos
+## Stack Tecnológico
 
-## 🚀 Tecnologías y Herramientas
+### Frontend (Interfaz)
+* **React + Vite**: SPA de alto rendimiento.
+* **TypeScript**: Desarrollo seguro con tipado estático.
+* **Axios & React Router**: Gestión de APIs y navegación.
+* **jsPDF**: Generación automática de comprobantes y reportes en PDF.
 
-El desarrollo se basa en un stack tecnológico de alto rendimiento:
+### Backend (Lógica y Datos)
+* **Node.js & Express**: Servidor robusto y escalable.
+* **SQLite3**: Base de datos relacional ligera y eficiente para almacenamiento local.
+* **JWT & Bcrypt**: Seguridad avanzada para autenticación y encriptación de credenciales.
 
-* **Frontend**: React + Vite para una experiencia de usuario ágil y reactiva.
-* **Lenguaje**: TypeScript, garantizando robustez mediante tipado estático.
-* **Diseño**: Ant Design, proporcionando una interfaz profesional y estandarizada.
-* **Optimización**: Desarrollo asistido por **Inteligencia Artificial**, aplicando metodologías de **Prompt Engineering**.
-* **Vite**: Next Generation Frontend Tooling (HMR, builds rápidos).
-* **ESLint**: Configuración para mantener la calidad y consistencia del código.
+## 🧠 Desarrollo Asistido
+Proyecto desarrollado aplicando metodologías de **Prompt Engineering**, optimizando la migración a TypeScript y la arquitectura del servidor mediante herramientas de **Inteligencia Artificial**.
 
 ## 🧠 Integración de IA
-
 Este proyecto destaca por la implementación de soluciones mediante asistencia avanzada de IA:
 
 * Migración y estructuración de lógica en **TypeScript** mediante flujos de trabajo optimizados.
